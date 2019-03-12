@@ -33,9 +33,13 @@ public class TechJobs {
 
             String actionChoice = getUserSelection("View jobs by:", actionChoices);
 
+            if (actionChoice == null) {return;}
+
             if (actionChoice.equals("list")) {
 
                 String columnChoice = getUserSelection("List", columnChoices);
+
+                if (columnChoice == null) {continue;}
 
                 if (columnChoice.equals("all")) {
                     printJobs(JobData.findAll());
@@ -56,12 +60,14 @@ public class TechJobs {
                 // How does the user want to search (e.g. by skill or employer)
                 String searchField = getUserSelection("Search by:", columnChoices);
 
+                if (searchField == null) {continue;}
+
                 // What is their search term?
                 System.out.println("\nSearch term: ");
                 String searchTerm = in.nextLine();
 
                 if (searchField.equals("all")) {
-                    System.out.println("Search all fields not yet implemented.");
+                    printJobs(JobData.findByValue(searchTerm)); ///Edited to call findByValue
                 } else {
                     printJobs(JobData.findByColumnAndValue(searchField, searchTerm));
                 }
@@ -75,6 +81,8 @@ public class TechJobs {
         Integer choiceIdx;
         Boolean validChoice = false;
         String[] choiceKeys = new String[choices.size()];
+
+        System.out.println("\nEnter 100 to return to first menu, then do it again to quit.");
 
         // Put the choices in an ordered structure so we can
         // associate an integer with each one
@@ -97,9 +105,13 @@ public class TechJobs {
             in.nextLine();
 
             // Validate user's input
-            if (choiceIdx < 0 || choiceIdx >= choiceKeys.length) {
+            if (choiceIdx < 0 || choiceIdx >= choiceKeys.length && choiceIdx != 100) {
                 System.out.println("Invalid choice. Try again.");
-            } else {
+            }
+            else if (choiceIdx == 100){  ///added a sentinal value to allow the user to leave
+                return null;
+            }
+            else {
                 validChoice = true;
             }
 
@@ -111,6 +123,15 @@ public class TechJobs {
     // Print a list of jobs
     private static void printJobs(ArrayList<HashMap<String, String>> someJobs) {
 
-        System.out.println("printJobs is not implemented yet");
+        for (HashMap<String, String> currRow : someJobs) {
+            for (String currField : currRow.keySet()) {
+                System.out.println(currField + ": " + currRow.get(currField));
+            }
+
+            System.out.println("********************************");
+        }
+
+        if (someJobs.size() == 0)
+            System.out.println("There are no results for the provided term(s).");
     }
 }
